@@ -1,7 +1,7 @@
 # IntelliQA: AI-Powered Quality Intelligence Platform
 
-[![CI](https://github.com/VishakhaGupta1/qa-intelligence-platform/actions/workflows/qa-pipeline.yml/badge.svg)](https://github.com/VishakhaGupta1/qa-intelligence-platform/actions/workflows/qa-pipeline.yml)
-[![Tests](https://img.shields.io/badge/tests-18%20passing-brightgreen)]
+[![CI](https://github.com/VishakhaGupta1/intelli-qa/actions/workflows/qa-pipeline.yml/badge.svg)](https://github.com/VishakhaGupta1/intelli-qa/actions/workflows/qa-pipeline.yml)
+[![Tests](https://img.shields.io/badge/tests-18%20passing-brightgreen)](https://github.com/VishakhaGupta1/intelli-qa/actions)
 
 IntelliQA is a comprehensive QA automation ecosystem that transforms OpenAPI specifications into executable test suites using AI. It provides a real-time dashboard for quality metrics, coverage analysis, and defect tracking.
 
@@ -17,14 +17,12 @@ Ensure you have the following installed:
 - **Node.js 20+** (for dashboard)
 
 ### 2. Setup Environment
-Clone the repository and generate your local `.env` file:
+Clone the repository and create your local `.env` file:
 ```bash
-git clone https://github.com/VishakhaGupta1/qa-intelligence-platform.git
-cd qa-intelligence-platform
-# On Linux/macOS:
-bash scripts/generate-secrets.sh
-# On Windows (Manual):
-cp .env.example .env
+git clone https://github.com/VishakhaGupta1/intelli-qa.git
+cd intelli-qa
+# Create .env from template
+cp .env.example .env # If .env.example exists, or create one manually
 ```
 
 ### 3. Spin Up Infrastructure
