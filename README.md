@@ -116,4 +116,3 @@ The platform includes a built-in PII redactor (`ai-generator/pii_redactor.py`) t
 - **AI Mocking**: If you want real AI generation, set `USE_MOCK=false` and provide a valid `GROK_API_KEY`.
 
 ---
-*Built with ❤️ for Modern QA Engineering.*
