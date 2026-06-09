@@ -1,0 +1,436 @@
+openapi: 3.0.3
+info:
+  title: IntelliQA Sample API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                version: 1.0.0
+  /api/products:
+    get:
+      summary: List products
+      responses:
+        '200':
+          description: Products returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              example:
+                - id: 1
+                  name: Aurora Lamp
+                  description: A warm desk lamp
+                  price: 49.99
+                  category: home
+                  inStock: true
+    post:
+      summary: Create product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+            example:
+              name: Orbit Desk
+              description: A compact desk lamp
+              price: 49.99
+              category: home
+              inStock: true
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                id: 6
+                name: Orbit Desk
+                description: A compact desk lamp
+                price: 49.99
+                category: home
+                inStock: true
+  /api/products/{id}:
+    get:
+      summary: Get product by id
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                id: 1
+                name: Aurora Lamp
+                description: A warm desk lamp
+                price: 49.99
+                category: home
+                inStock: true
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: product_not_found
+                message: product 99999 was not found
+    put:
+      summary: Update product by id
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+            example:
+              name: Orbit Desk Pro
+              description: An upgraded compact desk lamp
+              price: 59.99
+              category: home
+              inStock: false
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                id: 1
+                name: Orbit Desk Pro
+                description: An upgraded compact desk lamp
+                price: 59.99
+                category: home
+                inStock: false
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete product by id
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      responses:
+        '200':
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+              example:
+                message: Product deleted
+                deleted: true
+                id: 1
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/users:
+    get:
+      summary: List users
+      responses:
+        '200':
+          description: Users returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              example:
+                - id: 1
+                  name: Maya Carter
+                  email: maya.carter@example.com
+                  role: customer
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+            example:
+              name: Jordan Lee
+              email: jordan.lee@example.com
+              role: customer
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: 4
+                name: Jordan Lee
+                email: jordan.lee@example.com
+                role: customer
+  /api/users/{id}:
+    get:
+      summary: Get user by id
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: 1
+                name: Maya Carter
+                email: maya.carter@example.com
+                role: customer
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/orders:
+    get:
+      summary: List orders
+      responses:
+        '200':
+          description: Orders returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+              example:
+                - id: 1
+                  userId: 1
+                  productIds: [1, 2]
+                  total: 139.49
+                  status: fulfilled
+                  createdAt: '2026-05-20T10:15:00.000Z'
+    post:
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+            example:
+              userId: 1
+              productIds: [1, 2]
+              status: pending
+              total: 199.98
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                id: 4
+                userId: 1
+                productIds: [1, 2]
+                total: 199.98
+                status: pending
+                createdAt: '2026-05-23T10:00:00.000Z'
+  /api/orders/{id}:
+    get:
+      summary: Get order by id
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                id: 1
+                userId: 1
+                productIds: [1, 2]
+                total: 139.49
+                status: fulfilled
+                createdAt: '2026-05-20T10:15:00.000Z'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    ProductId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+    OrderId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, version]
+      properties:
+        status:
+          type: string
+          example: ok
+        version:
+          type: string
+          example: 1.0.0
+    Product:
+      type: object
+      required: [id, name, description, price, category, inStock]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Aurora Lamp
+        description:
+          type: string
+          example: A warm desk lamp
+        price:
+          type: number
+          format: float
+          example: 49.99
+        category:
+          type: string
+          example: home
+        inStock:
+          type: boolean
+          example: true
+    NewProduct:
+      type: object
+      required: [name, description, price, category, inStock]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category:
+          type: string
+        inStock:
+          type: boolean
+    ProductUpdate:
+      allOf:
+        - $ref: '#/components/schemas/NewProduct'
+    User:
+      type: object
+      required: [id, name, email, role]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+    NewUser:
+      type: object
+      required: [name, email, role]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+    Order:
+      type: object
+      required: [id, userId, productIds, total, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        productIds:
+          type: array
+          items:
+            type: integer
+        total:
+          type: number
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    NewOrder:
+      type: object
+      required: [userId, productIds, status, total]
+      properties:
+        userId:
+          type: integer
+        productIds:
+          type: array
+          items:
+            type: integer
+        status:
+          type: string
+        total:
+          type: number
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+    DeleteResponse:
+      type: object
+      required: [message, deleted, id]
+      properties:
+        message:
+          type: string
+        deleted:
+          type: boolean
+        id:
+          type: integer
