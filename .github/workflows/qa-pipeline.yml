@@ -59,6 +59,11 @@ jobs:
     environment: staging
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
     env:
       GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -66,7 +71,9 @@ jobs:
       MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
       MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
       MONGO_DB_NAME: qa_platform
+      MONGO_URI: mongodb://localhost:27017/qa_platform
       CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      USE_MOCK: true
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
