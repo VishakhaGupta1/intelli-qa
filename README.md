@@ -1,118 +1,78 @@
-# IntelliQA: AI-Powered Quality Intelligence Platform
+# IntelliQA: AI-Driven Quality Intelligence Platform
 
-[![CI](https://github.com/VishakhaGupta1/intelli-qa/actions/workflows/qa-pipeline.yml/badge.svg)](https://github.com/VishakhaGupta1/intelli-qa/actions/workflows/qa-pipeline.yml)
-[![Tests](https://img.shields.io/badge/tests-18%20passing-brightgreen)](https://github.com/VishakhaGupta1/intelli-qa/actions)
+IntelliQA is a modular, AI-powered QA ecosystem designed to automate the transition from API specifications to executable test suites. By leveraging Large Language Models (LLMs), it generates robust Java test cases, executes them against target applications, and provides a real-time intelligence dashboard for quality metrics and defect tracking.
 
-IntelliQA is a comprehensive QA automation ecosystem that transforms OpenAPI specifications into executable test suites using AI. It provides a real-time dashboard for quality metrics, coverage analysis, and defect tracking.
+## 🚀 System Overview
+
+The platform is structured into four specialized layers:
+
+1.  **AI Generator (Python)**: Parses OpenAPI/Swagger specifications and uses LLMs (Grok/Claude) to generate context-aware Java test cases. Includes PII redaction to ensure data privacy.
+2.  **Test Engine (Java)**: A JUnit 5 based execution environment using REST Assured for API validation and Selenium for UI automation. Results are automatically persisted to MongoDB.
+3.  **Quality API (Node.js)**: A secure Express backend that aggregates test results, calculates coverage gaps, and serves metrics via a RESTful API and Prometheus endpoints.
+4.  **Intelligence Dashboard (React)**: A modern Vite-powered frontend providing visual insights into pass rates, flakiness, defect heatmaps, and AI-driven coverage gap analysis.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🛠️ Local Development Setup
 
-### 1. Prerequisites
-Ensure you have the following installed:
+### Prerequisites
 - **Docker & Docker Compose**
-- **Java 17+** (for test execution)
-- **Python 3.11+** (for test generation)
-- **Node.js 20+** (for dashboard)
+- **Java 17+** & **Maven**
+- **Python 3.11+**
+- **Node.js 20+**
 
-### 2. Setup Environment
-Clone the repository and create your local `.env` file:
+### 1. Environment Configuration
+Initialize your environment variables:
 ```bash
-git clone https://github.com/VishakhaGupta1/intelli-qa.git
-cd intelli-qa
-# Create .env from template
-cp .env.example .env # If .env.example exists, or create one manually
+# On Linux/macOS:
+bash scripts/generate-secrets.sh
+# On Windows:
+cp .env.example .env # Then manually fill in keys
 ```
 
-### 3. Spin Up Infrastructure
-Start MongoDB, Selenium, and the Dashboard API:
+### 2. Infrastructure Deployment
+Spin up the required services (MongoDB, Selenium, Prometheus, Grafana, and the APIs):
 ```bash
 docker-compose up -d --build
 ```
 
-### 4. Generate AI Tests
-Run the Python generator to create Java test cases from the API spec:
+### 3. Test Generation & Execution
+Generate tests from a specification and run the suite:
 ```bash
+# Generate Java tests from spec
 python ai-generator/main.py --spec ai-generator/specs/sample-api.yaml
-```
-*Note: By default, this uses mock AI responses. Set `GROK_API_KEY` in `.env` for live generation.*
 
-### 5. Execute Tests
-Run the generated Java suite:
-```bash
+# Run the generated suite
 mvn -f test-engine/pom.xml test
 ```
 
-### 6. View Dashboard
-Start the React UI:
+### 4. Access the Dashboard
 ```bash
 cd dashboard-ui
 npm install
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) to see your live quality metrics.
+Navigate to [http://localhost:5173](http://localhost:5173) to view the quality metrics.
 
 ---
 
-## 🏗️ Architecture
+## 📂 Project Structure
 
-```mermaid
-flowchart LR
-    subgraph "Layer 1: AI Generator"
-        A[OpenAPI Spec] --> B[Python Engine]
-        B -->|LLM / Groq| C[Generated Java Tests]
-    end
-
-    subgraph "Layer 2: Test Engine"
-        C --> D[Java / JUnit 5]
-        D -->|Selenium / REST Assured| E[Application Under Test]
-    end
-
-    subgraph "Layer 3: Backend & Storage"
-        D -->|Store Results| F[(MongoDB)]
-        F --> G[Node.js API]
-        G -->|Prometheus| H[Metrics]
-    end
-
-    subgraph "Layer 4: Visualization"
-        G --> I[React Dashboard]
-        H --> J[Grafana]
-    end
+```text
+├── ai-generator/       # AI test generation engine (Python)
+├── test-engine/        # Java execution environment (JUnit 5, Selenium)
+├── dashboard-api/      # Backend service for metrics (Node.js, Express)
+├── dashboard-ui/       # Quality intelligence frontend (React, Vite)
+├── sample-api/         # Mock application for demonstration
+├── monitoring/         # Prometheus & Grafana configurations
+└── scripts/            # Utility scripts for seeding and secrets
 ```
 
 ---
 
-## 📦 Project Structure
-
-- **`ai-generator/`**: Python tool that parses OpenAPI specs and generates Java tests using LLMs.
-- **`test-engine/`**: Java/Maven project that executes API and UI tests, reporting results to MongoDB.
-- **`dashboard-api/`**: Node.js backend that serves quality metrics and reports.
-- **`dashboard-ui/`**: React/Vite frontend for the quality intelligence dashboard.
-- **`sample-api/`**: A mock Node.js API used for demonstration and testing.
-- **`monitoring/`**: Prometheus and Grafana configurations for system health.
-- **`scripts/`**: Utility scripts for database seeding, backups, and secret rotation.
-
----
-
-## 🛠️ Advanced Usage
-
-### Self-Healing Tests
-The generator can "heal" failing tests by analyzing previous run results in MongoDB and adjusting test data or assertions automatically.
-
-### PII Redaction
-The platform includes a built-in PII redactor (`ai-generator/pii_redactor.py`) that ensures sensitive data like SSNs, emails, and tokens never leave your infrastructure during AI prompt generation.
-
-### Monitoring
-- **Prometheus**: [http://localhost:9090](http://localhost:9090)
-- **Grafana**: [http://localhost:3003](http://localhost:3003) (Default: admin/admin)
-
----
-
-## ❓ Troubleshooting
-
-- **MongoDB Connection**: Ensure port `27018` is free. If using a local Mongo, update `MONGO_URI` in `.env`.
-- **Selenium Errors**: If UI tests fail locally, ensure the `qa_selenium` container is healthy or adjust `SELENIUM_REMOTE_URL`.
-- **AI Mocking**: If you want real AI generation, set `USE_MOCK=false` and provide a valid `GROK_API_KEY`.
+## 🔒 Security & Privacy
+- **PII Redaction**: The generator automatically redacts sensitive fields (passwords, tokens, emails) from prompts before sending them to LLM providers.
+- **JWT Authentication**: The Dashboard API is protected by JWT-based authentication.
+- **Mock Fallback**: Supports a `USE_MOCK` mode for local development without requiring live AI API keys.
 
 ---
