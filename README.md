@@ -1,78 +1,91 @@
-# IntelliQA: AI-Driven Quality Intelligence Platform
+# IntelliQA: Quality Intelligence Platform
 
-IntelliQA is a modular, AI-powered QA ecosystem designed to automate the transition from API specifications to executable test suites. By leveraging Large Language Models (LLMs), it generates robust Java test cases, executes them against target applications, and provides a real-time intelligence dashboard for quality metrics and defect tracking.
+IntelliQA is a professional-grade automated testing ecosystem. It leverages AI to transform OpenAPI specifications into executable Java test suites, provides end-to-end UI automation via Selenium, and centralizes all quality metrics into a real-time intelligence dashboard.
 
-## 🚀 System Overview
+## 🏗️ Architecture
 
-The platform is structured into four specialized layers:
+```mermaid
+flowchart TD
+    subgraph "AI Generation Layer"
+        A[OpenAPI Spec] --> B[Python Generator]
+        B -->|LLM / Groq| C[JUnit 5 Test Code]
+        B -->|PII Redactor| B
+    end
 
-1.  **AI Generator (Python)**: Parses OpenAPI/Swagger specifications and uses LLMs (Grok/Claude) to generate context-aware Java test cases. Includes PII redaction to ensure data privacy.
-2.  **Test Engine (Java)**: A JUnit 5 based execution environment using REST Assured for API validation and Selenium for UI automation. Results are automatically persisted to MongoDB.
-3.  **Quality API (Node.js)**: A secure Express backend that aggregates test results, calculates coverage gaps, and serves metrics via a RESTful API and Prometheus endpoints.
-4.  **Intelligence Dashboard (React)**: A modern Vite-powered frontend providing visual insights into pass rates, flakiness, defect heatmaps, and AI-driven coverage gap analysis.
+    subgraph "Execution Layer"
+        C --> D[Java Test Engine]
+        D -->|REST Assured| E[Target API]
+        D -->|Selenium| F[Target UI]
+    end
+
+    subgraph "Data & Analytics Layer"
+        D -->|Test Results| G[(MongoDB)]
+        G --> H[Node.js Quality API]
+        H --> I[React Dashboard]
+        H -->|Metrics| J[Prometheus / Grafana]
+    end
+```
+
+## 📋 Prerequisites
+
+Ensure you have the following installed before starting:
+
+- **Docker & Docker Compose**: For database, Selenium Grid, and monitoring.
+- **Java 17+ (JDK)**: To execute the Maven-based test engine.
+- **Python 3.11+**: For the AI test generation logic.
+- **Node.js 20+**: To run the dashboard and metrics API.
+- **Maven 3.8+**: For dependency management and test execution.
 
 ---
 
-## 🛠️ Local Development Setup
+## 🚀 Quick Start
 
-### Prerequisites
-- **Docker & Docker Compose**
-- **Java 17+** & **Maven**
-- **Python 3.11+**
-- **Node.js 20+**
-
-### 1. Environment Configuration
-Initialize your environment variables:
-```bash
-# On Linux/macOS:
-bash scripts/generate-secrets.sh
-# On Windows:
-cp .env.example .env # Then manually fill in keys
+### 1. Configure API Access
+Open the existing `.env` file in the root directory and update your Groq credentials:
+```env
+GROQ_API_KEY=your_key_here
+USE_MOCK=false
 ```
 
-### 2. Infrastructure Deployment
-Spin up the required services (MongoDB, Selenium, Prometheus, Grafana, and the APIs):
-```bash
-docker-compose up -d --build
+### 2. Launch Platform
+Run the startup script to provision infrastructure, generate AI tests, and initialize the dashboard.
+
+**Windows:**
+```powershell
+.\run.bat
 ```
 
-### 3. Test Generation & Execution
-Generate tests from a specification and run the suite:
+**Linux / macOS:**
 ```bash
-# Generate Java tests from spec
-python ai-generator/main.py --spec ai-generator/specs/sample-api.yaml
-
-# Run the generated suite
-mvn -f test-engine/pom.xml test
+chmod +x run.sh && ./run.sh
 ```
-
-### 4. Access the Dashboard
-```bash
-cd dashboard-ui
-npm install
-npm run dev
-```
-Navigate to [http://localhost:5173](http://localhost:5173) to view the quality metrics.
 
 ---
+
+## 🛠️ Core Capabilities
+
+- **AI Test Generation**: Uses Llama 3.3 to generate context-aware JUnit 5 tests from OpenAPI 3.0 specs.
+- **Self-Healing Engine**: Automatically improves test reliability by analyzing historical execution failures.
+- **Privacy-First Design**: Built-in PII redactor scrubs sensitive data before interacting with external AI providers.
+- **Unified Analytics**: Real-time visualization of pass rates, flakiness trends, and coverage gaps.
+- **Full-Stack Coverage**: Integrated support for REST Assured (API) and Selenium Grid (UI) testing.
+
+## 📊 System Components
+
+| Component | URL | Description |
+| :--- | :--- | :--- |
+| **Intelligence Dashboard** | [http://localhost:5173](http://localhost:5173) | Primary UI for quality metrics and AI scores. |
+| **Quality API** | [http://localhost:3001](http://localhost:3001) | Backend service for result aggregation. |
+| **Sample Application** | [http://localhost:4000](http://localhost:4000) | The target system currently under test. |
+| **Selenium Grid** | [http://localhost:4444](http://localhost:4444) | Distributed browser automation environment. |
 
 ## 📂 Project Structure
 
-```text
-├── ai-generator/       # AI test generation engine (Python)
-├── test-engine/        # Java execution environment (JUnit 5, Selenium)
-├── dashboard-api/      # Backend service for metrics (Node.js, Express)
-├── dashboard-ui/       # Quality intelligence frontend (React, Vite)
-├── sample-api/         # Mock application for demonstration
-├── monitoring/         # Prometheus & Grafana configurations
-└── scripts/            # Utility scripts for seeding and secrets
-```
-
----
-
-## 🔒 Security & Privacy
-- **PII Redaction**: The generator automatically redacts sensitive fields (passwords, tokens, emails) from prompts before sending them to LLM providers.
-- **JWT Authentication**: The Dashboard API is protected by JWT-based authentication.
-- **Mock Fallback**: Supports a `USE_MOCK` mode for local development without requiring live AI API keys.
+- `run.bat` / `run.sh` - Unified startup scripts for the entire platform.
+- `ai-generator/` - Python engine for LLM orchestration and spec parsing.
+- `test-engine/` - Java/Maven framework for API and UI execution.
+- `dashboard-api/` - Node.js service for metrics and MongoDB integration.
+- `dashboard-ui/` - React/Vite frontend for quality visualization.
+- `monitoring/` - Prometheus and Grafana observability stack.
 
 ---

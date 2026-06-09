@@ -106,6 +106,8 @@ def call_groq(prompt_text: str, timeout: int = 30) -> str:
             _record_grok_call()
             return _extract_content(response.json())
         except Exception as exc:
+            if hasattr(exc, 'response') and exc.response is not None:
+                logger.error(f"Groq API Error Detail: {exc.response.text}")
             last_error = exc
             if attempt < 2:
                 time.sleep(2 ** attempt)

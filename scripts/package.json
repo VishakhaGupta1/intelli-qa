@@ -1,0 +1,9 @@
+{
+  "name": "intelli-qa-scripts",
+  "version": "1.0.0",
+  "description": "Database seeding and utility scripts",
+  "main": "seed-mongo.js",
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  }
+}
